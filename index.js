@@ -20,3 +20,48 @@ db.promise().query("SELECT * FROM employee_db").then(data => {
     console.log(data)
 });
 
+//  variables for queries and prompt response
+let dbRows = [];
+let inquirerOutput = [];
+
+// switch for all user input cases
+switch (select) {
+    // id, name
+    case "View All Departments":
+        dbRows = await db.query("SELECT * FROM department");
+        console.table(dbRows[0]);
+        break;
+
+    // role id, job title, department value, salary value
+    case "View All Roles":
+        dbRows = await db.query(`
+                SELECT
+                    role_id,
+                    role_title,
+                    role_salary,
+                    department_name AS department
+                FROM role
+                JOIN department ON role.department_id = department.id
+                `);
+        console.table(dbRows[0]);
+        break;
+
+    // employee id, first name, last name, job title, department, salary and manager
+    case "View All Employees":
+        dbRows = await db.query(`
+                SELECT
+                    employee_id,
+                    employee.first_name,
+                    employee.last_name,
+                    role.title AS title,
+                    department.name AS department,
+                    role.salary AS salary,
+                    CASE WHEN employee.manager_id IS NOT NULL THEN CONCAT(manager_table.first_name,' ', manager_table.last_name) ELSE NULL END AS manager
+                FROM employee
+                JOIN role ON employee.role_id = role.id
+                JOIN department ON role.department_id = department.id
+                JOIN employee manager_table ON employee.manager_id = manager_table.id
+                `);
+        console.table(dbRows[0]);
+        break;
+}
