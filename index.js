@@ -28,13 +28,13 @@ let inquirerOutput = [];
 switch (select) {
     // id, name
     case "View All Departments":
-        dbRows = await db.query("SELECT * FROM department");
+        dbRows =  db.query("SELECT * FROM department");
         console.table(dbRows[0]);
         break;
 
     // role id, job title, department value, salary value
     case "View All Roles":
-        dbRows = await db.query(`
+        dbRows =  db.query(`
                 SELECT
                     role_id,
                     role_title,
@@ -42,13 +42,15 @@ switch (select) {
                     department_name AS department
                 FROM role
                 JOIN department ON role.department_id = department.id
-                `);
+                `).then(data => {
+
+                });
         console.table(dbRows[0]);
         break;
 
     // employee id, first name, last name, job title, department, salary and manager
     case "View All Employees":
-        dbRows = await db.query(`
+        dbRows =  db.query(`
                 SELECT
                     employee_id,
                     employee.first_name,
@@ -61,7 +63,43 @@ switch (select) {
                 JOIN role ON employee.role_id = role.id
                 JOIN department ON role.department_id = department.id
                 JOIN employee manager_table ON employee.manager_id = manager_table.id
-                `);
+                `).then(data => {
+
+                }
+                );
         console.table(dbRows[0]);
         break;
 }
+
+function inqPrompt() {
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "select",
+          message: "What would you like to do?",
+          choices: [
+            "View All Departments",
+            "View All Roles",
+            "View All Employees",
+            "Add a Department",
+            "Add a Role",
+            "Add an Employee",
+            "Update an Employee Role",
+            new inquirer.Separator(),
+            "Quit",
+          ],
+        },
+      ])
+      .then(async (res) => {
+        await dbConnection(res.select);
+        res.select === "Quit" ? process.exit() : inqPrompt();
+      })
+      .catch((err) => {
+        if (error.isTtyError) {
+        } else {
+          err;
+        }
+      });
+  }
+inqPrompt()  
