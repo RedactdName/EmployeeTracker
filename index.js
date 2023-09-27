@@ -28,25 +28,28 @@ async function getDb(select) {
                         console.error('Error executing the query', err);
                         return;
                     };
-                    console.table(dbRows[0]);
+                    console.table(results);
                 });
-                    break;
+                break;
 
             // WHEN I choose to view all roles
             // THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
             case "View All Roles":
-                dbRows = db.query(`
-                        SELECT
-                        role_id,
-                        role_title,
-                        role_salary,
-                        department_name AS department
-                        FROM role
-                        JOIN department ON role.department_id = department.id
-                        `).then(data => {
+                dbRows = db.query(`SELECT * FROM role`
+                        // role_id,
+                        // role_title,
+                        // role_salary,
+                        // department_name AS department
+                        // FROM role
+                        // JOIN department ON role.department_id = department.id
+                        , (err, results) => {
+                            if (err) {
+                                console.error('Error executing the query', err);
+                                return;
+                            };
 
                 });
-                console.table(dbRows[0]);
+                console.table(results);
                 break;
 
 
@@ -70,7 +73,7 @@ async function getDb(select) {
 
                 }
                 );
-                console.table(dbRows[0]);
+                console.table(results);
                 break;
             // enter name; department added to db
             // WHEN I choose to add a department
