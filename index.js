@@ -1,15 +1,17 @@
 // GIVEN a command-line application that accepts user input
-// const db = require("./config/connection")
+const db = require("./config/connection")
 // db.promise().query("SELECT * FROM employee_db").then(data => {
     //     console.log(data)
     // });
-    async function getDb(select) {
+    const inquirer = require("inquirer");
+    
+    async function createConnection(select) {
         try {
             const db = await mysql.createConnection({
                 host: "localhost",
-                user: dbUser,
-                password: dbPassword,
-                database: dbName,
+                user: DB_USER,
+                password: DB_PASSWORD,
+                database: DB_NAME,
             });
             
             //  variables for queries and prompt response
@@ -227,8 +229,8 @@
             console.log(err);
             
         };
-        
-        // WHEN I start the application
+    }
+    // WHEN I start the application
         // THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
         function inqPrompt() {
             inquirer.prompt([
@@ -250,7 +252,7 @@
                 },
             ])
             .then(async (res) => {
-                await getDb(res.select);
+                await createConnection(res.select);
                 res.select === "Quit" ? process.exit() : inqPrompt();
             })
             .catch((err) => {
@@ -261,4 +263,4 @@
             });
         }
         inqPrompt()  
-    }
+    
