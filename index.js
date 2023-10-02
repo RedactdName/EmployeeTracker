@@ -35,13 +35,13 @@ async function getDb(select) {
             // WHEN I choose to view all roles
             // THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
             case "View All Roles":
-                dbRows = db.query(`SELECT * FROM role
-                        role_id,
-                        role_title,
-                        role_salary,
-                        department_name AS department
+                dbRows = db.query(`SELECT 
+                        role.id,
+                        role.title,
+                        role.salary,
+                        department.dept_name AS department
                         FROM role
-                        JOIN department ON role.department_id = department.id`
+                        LEFT JOIN department ON role.department_id = department.id`
                         , (err, results) => {
                             if (err) {
                                 console.error('Error executing the query', err);
@@ -56,18 +56,18 @@ async function getDb(select) {
             // WHEN I choose to view all employees
             // THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
             case "View All Employees":
-                dbRows = db.query(`SELECT FROM employee
-                    employee_id,
+                dbRows = db.query(`SELECT 
+                    employee.id,
                     employee.first_name,
                     employee.last_name,
                     role.title AS title,
-                    department.name AS department,
+                    department.dept_name AS department,
                     role.salary AS salary,
                     CASE WHEN employee.manager_id IS NOT NULL THEN CONCAT(manager_table.first_name,' ', manager_table.last_name) ELSE NULL END AS manager
                     FROM employee
                     JOIN role ON employee.role_id = role.id
                     JOIN department ON role.department_id = department.id
-                    JOIN employee manager_table ON employee.manager_id = manager_table.id`, (err, results) => {
+                    LEFT JOIN employee AS manager_table ON employee.manager_id = manager_table.id`, (err, results) => {
                     if (err) {
                         console.error('Error executing the query:', err);
                         return;
@@ -76,26 +76,7 @@ async function getDb(select) {
                     console.table(results);
                 });
                 break;
-                // dbRows = db.query(`
-                //             SELECT
-                //             employee_id,
-                //             employee.first_name,
-                //             employee.last_name,
-                //             role.title AS title,
-                //             department.name AS department,
-                //             role.salary AS salary,
-                //             CASE WHEN employee.manager_id IS NOT NULL THEN CONCAT(manager_table.first_name,' ', manager_table.last_name) ELSE NULL END AS manager
-                //             FROM employee
-                //             JOIN role ON employee.role_id = role.id
-                //             JOIN department ON role.department_id = department.id
-                //             JOIN employee manager_table ON employee.manager_id = manager_table.id
-                //             `).then(data => {
-
-                // }
-                // );
-                // console.table(results);
-                // break;
-            // enter name; department added to db
+          
             // WHEN I choose to add a department
             // THEN I am prompted to enter the name of the department and that department is added to the database
             case "Add a Department":
