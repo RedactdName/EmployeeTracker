@@ -48,8 +48,8 @@ async function getDb(select) {
                                 return;
                             };
 
+                            console.table(results);
                 });
-                console.table(results);
                 break;
 
 
@@ -98,7 +98,7 @@ async function getDb(select) {
 
                 break;
 
-            // enter name, salary, department; role added to db
+            
             // WHEN I choose to add a role
             // THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
             case "Add a Role":
