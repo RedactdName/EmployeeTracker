@@ -89,10 +89,11 @@ async function getDb(select) {
 
                 try {
                     // Run the update query here:
-                    dbRows = await db.query(
-                        `INSERT INTO department (name) VALUES ('${inquirerOutput.department}');`
+                    dbRows = await db.promise().query(
+                        `INSERT INTO department (dept_name) VALUES ('${inquirerOutput.department}');`
                     );
                 } catch (error) {
+                    console.log(error)
                     console.log("Cannot insert duplicate Department");
                 }
 
@@ -121,8 +122,8 @@ async function getDb(select) {
                 const { roleName, roleSalary, roleDpt } = inquirerOutput;
 
                 // Make a variable to store value from the DB call to get department id
-                const showDeptId = await db.query(
-                    `SELECT IFNULL((SELECT id FROM department WHERE name = "${roleDpt}"), "Department Does Not Exist")`
+                const showDeptId = await db.promise().query(
+                    `SELECT IFNULL((SELECT id FROM department WHERE dept_name = "${roleDpt}"), "Department Does Not Exist")`
                 );
 
                 // Write a query to get the department id from the name
@@ -134,7 +135,7 @@ async function getDb(select) {
                     console.log("Enter a Role in an Existing Department!");
                     break;
                 }   // Write the query to add a role to the db:
-                dbRows = await db.query(
+                dbRows = await db.promise().query(
                     ` INSERT INTO role (title, salary, department_id) VALUES ('${roleName}', '${roleSalary}', '${department_id}');`
                 );
 
@@ -163,13 +164,13 @@ async function getDb(select) {
                     },
                 ]);
 
-                const showDeptIdRoles = await db.query("select * from role;");
-                const showManagers = await db.query("select * from employee where manager_id is null;"
+                const showDeptIdRoles = await db.promise().query("select * from role;");
+                const showManagers = await db.promise().query("select * from employee where manager_id is null;"
                 );
 
                 const { first_name, last_name, role, manager } = inquirerOutput;
 
-                const role_data = allRoles[0].filter((r) => {
+                const role_data = showDeptIdRoles[0].filter((r) => {
                     return r.title === role;
                 });
 
@@ -177,7 +178,7 @@ async function getDb(select) {
                     return `${m.first_name} ${m.last_name}` === manager;
                 });
 
-                dbRows = await db.query(
+                dbRows = await db.promise().query(
                     `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${first_name}', '${last_name}', ${role_data[0].id}, ${manager_data[0].id})`
                 );
 
@@ -187,10 +188,10 @@ async function getDb(select) {
             // WHEN I choose to update an employee role
             // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
             case "Update an Employee Role":
-                currentEmployees = await db.query(`
+                currentEmployees = await db.promise().query(`
                                 SELECT id, first_name, last_name FROM employee;`);
 
-                currentRoles = await db.query(`
+                currentRoles = await db.promise().query(`
                                 SELECT id, title FROM role;`);
 
                 const employeeList = currentEmployees[0].map((employee) => {
@@ -225,7 +226,7 @@ async function getDb(select) {
                 console.log(inquirerOutput);
 
                 // Run the update query here:
-                dbRows = await db.query(`
+                dbRows = await db.promise().query(`
                 UPDATE employee
                 SET role_id = ${inquirerOutput.newRole}                  
                 WHERE employee.id = ${inquirerOutput.employeeId};`);
